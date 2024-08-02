@@ -17,6 +17,17 @@
         - "{{ icons_dir }}"
       changed_when: false
 
+    - name: "Get icons"
+      ansible.builtin.get_url:
+        # https://raw.githubusercontent.com/octocat/Hello-World/master/README
+        url: "https://raw.githubusercontent.com/mhjacks/mekinstall/main/icons/{{ item }}"
+        dest: "{{ icons_dir }}/{{ item }}"
+        mode: "0644"
+      loop:
+        - megamek.png
+        - megameklab.png
+        - mekhq.png
+
     - name: "Write .desktop files"
       ansible.builtin.copy:
         content: |

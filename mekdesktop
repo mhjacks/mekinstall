@@ -1,0 +1,68 @@
+#!/usr/bin/ansible-playbook
+---
+- name: "Install desktop files and icons in a linux homedir"
+  hosts: localhost
+  become: false
+  gather_facts: true
+  vars:
+    inst_dir: "{{ '~/megamek' | expanduser }}"
+    desktop_dir: "{{ '~/.local/share/applications' | expanduser }}"
+    icons_dir: "{{ '~/.local/share/icons' | expanduser }}"
+  tasks:
+    - name: "Ensure directories are present"
+      ansible.builtin.command: |-
+        mkdir -p {{ item }}
+      loop:
+        - "{{ desktop_dir }}"
+        - "{{ icons_dir }}"
+      changed_when: false
+
+    - name: "Write .desktop files"
+      ansible.builtin.copy:
+        content: |
+          [Desktop Entry]
+          #Version=1.0
+          Type=Application
+          Name={{ item.name }}
+          GenericName={{ item.name }}
+          Comment={{ item.comment }}
+          Icon={{ item.icon }}
+
+          Exec=bash -c "cd ~/megamek/{{ item.dir }} && ~/megamek/{{ item.dir }}/{{ item.cmd }}"
+          Terminal=false
+          StartupNotify=false
+
+          Categories=Game
+        dest: "{{ desktop_dir }}/{{ item.dir }}.desktop"
+        mode: "0644"
+      loop:
+        - name: MegaMek
+          dir: megamek
+          cmd: mm-startup
+          icon: megamek
+          comment: Kill All Monsters
+        - name: MegaMekLab
+          dir: megameklab
+          cmd: mml-startup
+          icon: megameklab
+          comment: Kill All Monsters Lab
+        - name: MekHQ
+          dir: mekhq
+          cmd: mhq-startup
+          icon: mekhq
+          comment: Kill All Monsters on Campaign
+        - name: MegaMek SNAPSHOT
+          dir: megamek-SNAPSHOT
+          cmd: megamek-startup
+          icon: megamek
+          comment: Kill All Monsters SNAPSHOT
+        - name: MegaMekLab SNAPSHOT
+          dir: megameklab-SNAPSHOT
+          cmd: megameklab-startup
+          icon: megameklab
+          comment: Kill All Monsters Lab SNAPSHOT
+        - name: MekHQ SNAPSHOT
+          dir: mekhq-SNAPSHOT
+          cmd: mekhq-startup
+          icon: mekhq
+          comment: Kill All Monsters on Campaign SNAPSHOT

@@ -27,6 +27,7 @@
         - megamek.png
         - megameklab.png
         - mekhq.png
+      ignore_errors: true
 
     - name: "Write .desktop files"
       ansible.builtin.copy:

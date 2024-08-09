@@ -7,11 +7,12 @@
     bin_dir: "{{ '~/bin' | expanduser }}"
   tasks:
     - name: "Ensure directories are present"
-      ansible.builtin.command: |-
-        mkdir -p {{ item }}
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0755"
       loop:
         - "{{ bin_dir }}"
-      changed_when: false
 
     - name: "Get scripts"
       ansible.builtin.get_url:

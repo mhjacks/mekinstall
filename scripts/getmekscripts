@@ -1,0 +1,26 @@
+#!/usr/bin/ansible-playbook
+---
+- name: "Install scripts to manage MegaMek installations"
+  hosts: localhost
+  become: false
+  vars:
+    bin_dir: "{{ '~/bin' | expanduser }}"
+  tasks:
+    - name: "Ensure directories are present"
+      ansible.builtin.command: |-
+        mkdir -p {{ item }}
+      loop:
+        - "{{ bin_dir }}"
+      changed_when: false
+
+    - name: "Get scripts"
+      ansible.builtin.get_url:
+        # https://raw.githubusercontent.com/octocat/Hello-World/master/README
+        url: "https://raw.githubusercontent.com/mhjacks/mekinstall/main/scripts/{{ item }}"
+        dest: "{{ bin_dir }}/{{ item }}"
+        mode: "0755"
+      loop:
+        - newmek
+        - mekdesktop
+        - getmekscripts
+        - setup_mm.sh

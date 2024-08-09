@@ -3,6 +3,7 @@
 - name: "Install scripts to manage MegaMek installations"
   hosts: localhost
   become: false
+  gather_facts: false
   vars:
     bin_dir: "{{ '~/bin' | expanduser }}"
   tasks:

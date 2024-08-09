@@ -1,0 +1,64 @@
+#!/bin/bash
+
+mkdir ~/mm 2>/dev/null
+
+changed=0
+
+for x in megamek megameklab mekhq;
+do
+	echo $x
+	cd ~/gitwork/$x
+	old_sha=`git rev-parse HEAD 2>/dev/null`
+	git up
+	new_sha=`git rev-parse HEAD 2>/dev/null`
+
+	if [ "$old_sha" != "$new_sha" ]; then
+		changed=1
+	fi
+done
+
+if [ "$changed" == "0" ]; then
+	echo "No change - we do not need to build"
+	tarball_ct=`ls ~/mm | wc -l`
+	if [ "$tarball_ct" == "0" ]; then
+		echo "But no tarballs found so how about we do, anyway"
+	else
+		exit 0
+	fi
+fi
+
+for x in megamek megameklab mekhq;
+do
+	echo $x
+	cd ~/gitwork/$x
+
+	git up
+	git reset --hard HEAD
+    ./gradlew clean
+done
+
+for x in mekhq megamek megameklab;
+do
+	echo $x
+	cd ~/gitwork/$x
+	./gradlew clean build
+done
+
+ls -l ~/gitwork/mekhq/MekHQ/build/distributions/*.tar.gz
+cp ~/gitwork/mekhq/MekHQ/build/distributions/*.tar.gz ~/mm
+
+ls -l ~/gitwork/megamek/megamek/build/distributions/*.tar.gz
+cp ~/gitwork/megamek/megamek/build/distributions/*.tar.gz ~/mm
+
+ls -l ~/gitwork/megameklab/megameklab/build/distributions/*.tar.gz
+cp ~/gitwork/megameklab/megameklab/build/distributions/*.tar.gz ~/mm
+
+for x in megamek megameklab mekhq;
+do
+	echo $x
+	cd ~/gitwork/$x
+	./gradlew clean
+	git reset --hard HEAD
+done
+
+ls -l ~/mm

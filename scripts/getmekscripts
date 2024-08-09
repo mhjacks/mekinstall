@@ -22,6 +22,7 @@
         dest: "{{ bin_dir }}/{{ item }}"
         mode: "0755"
       loop:
+        - mekbuild
         - newmek
         - mekdesktop
         - getmekscripts

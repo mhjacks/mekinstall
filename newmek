@@ -1,0 +1,132 @@
+#!/usr/bin/ansible-playbook
+---
+- name: "Install latest version of mekhq"
+  hosts: localhost
+  become: false
+  gather_facts: true
+  vars:
+    source_dir: "{{ '~/mm' | expanduser }}"
+    inst_dir: "{{ '~/megamek' | expanduser }}"
+    tarball_pattern: "[Mm]ek[Hh][Qq]*"
+    manage_symlinks: false
+    # fallback_fetch: 'http://repo.imladris.lan/repo//tarballs/megamek/MekHQ-0.50.0-SNAPSHOT.tar.gz'
+    fallback_fetch: 'http://nwamek.zapto.org:3052/MekHQ-0.50.0-SNAPSHOT.tar.gz'
+    megamek_heap_size_mb: "{{ [(ansible_facts.memtotal_mb * 0.25) | int, 2048] | max }}"
+    var_debug: false
+  tasks:
+    - name: Test task
+      ansible.builtin.debug:
+        msg: 'source_dir: {{ source_dir }} / inst_dir: {{ inst_dir }} / tarball_pattern: {{ tarball_pattern }}'
+
+    - name: "Set mekhq spec"
+      ansible.builtin.set_fact:
+        mekhq_spec: '{{ source_dir }}/{{ tarball_pattern }}'
+
+    - name: "Discover or retrieve mekhq"
+      block:
+        - name: "Discover latest mekhq version"
+          ansible.builtin.set_fact:
+            latest_mekhq: '{{ mekhq_spec | fileglob | last }}'
+
+        - name: "Check to see if we found one"
+          ansible.builtin.assert:
+            that:
+              - latest_mekhq is defined
+      rescue:
+        - name: Get latest mekhq from local source
+          ansible.builtin.get_url:
+            url: "{{ fallback_fetch }}"
+            dest: "{{ source_dir }}"
+            mode: "0644"
+      always:
+        - name: "Discover latest mekhq version"
+          ansible.builtin.set_fact:
+            latest_mekhq: '{{ mekhq_spec | fileglob | last }}'
+
+
+
+    - name: "Set symlink specs for normal release"
+      ansible.builtin.set_fact:
+        mekhq_symlinks:
+          - megamek
+          - megameklab
+          - mekhq
+
+    - name: "Change symlink specs for SNAPSHOT versions"
+      ansible.builtin.set_fact:
+        mekhq_symlinks: "{{ mekhq_symlinks | map('regex_replace', '$', '-SNAPSHOT') | list }}"
+      when: "'SNAPSHOT' in latest_mekhq"
+
+    - name: Debug task var
+      ansible.builtin.debug:
+        var: latest_mekhq
+      when: var_debug
+
+    - name: "Determine mekhq dirname"
+      ansible.builtin.set_fact:
+        mekhq_dirname: "{{ latest_mekhq | basename | replace('.tar.gz', '') }}"
+
+    - name: Debug task var
+      ansible.builtin.debug:
+        var: mekhq_dirname
+      when: var_debug
+
+    - name: "Determine mekhq fulldir"
+      ansible.builtin.set_fact:
+        mekhq_fulldir: "{{ inst_dir }}/{{ mekhq_dirname }}"
+
+    - name: Debug task var
+      ansible.builtin.debug:
+        var: mekhq_fulldir
+      when: var_debug
+
+    - name: Check for previous installation
+      ansible.builtin.stat:
+        path: '{{ mekhq_fulldir }}'
+      register: mekhq_previous
+
+    - name: Remove previous installation
+      ansible.builtin.file:
+        path: '{{ mekhq_fulldir }}'
+        state: absent
+      when: mekhq_previous.stat.exists
+
+    - name: Extract mekhq tarball
+      ansible.builtin.command:
+        cmd: 'tar xvf {{ latest_mekhq }}'
+        chdir: '{{ inst_dir }}'
+
+    - name: Run setup script
+      ansible.builtin.command:
+        cmd: 'setup_mm.sh'
+        chdir: '{{ mekhq_fulldir }}'
+
+#    - name: "Create symlinks if needed"
+#      ansible.builtin.command:
+#        cmd: ln -s '{{ item.src }}' '{{ item.dest }}'
+#        chdir: '{{ mekhq_fulldir }}'
+#      loop:
+#        - { src: MegaMek.sh, dest: mm-startup }
+#        - { src: MegaMekLab.sh, dest: mml-startup }
+#        - { src: MekHQ.sh, dest: mhq-startup }
+#      ignore_errors: true
+
+    - name: "Adjust Megamek Heap size"
+      ansible.builtin.replace:
+        path: '{{ mekhq_fulldir }}/bin/MegaMek'
+        regexp: '-Xmx\d+m'
+        replace: '-Xmx{{ megamek_heap_size_mb }}m'
+
+    - name: Setup symlinks
+      block:
+        - name: Remove previous symlinks
+          ansible.builtin.file:
+            path: '{{ inst_dir }}/{{ item }}'
+            state: absent
+          loop: '{{ mekhq_symlinks }}'
+
+        - name: Add new symlinks
+          ansible.builtin.command:
+            cmd: 'ln -s {{ mekhq_dirname }} {{ item }}'
+            chdir: '{{ inst_dir }}'
+          loop: '{{ mekhq_symlinks }}'

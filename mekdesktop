@@ -27,7 +27,6 @@
         - megamek.png
         - megameklab.png
         - mekhq.png
-      ignore_errors: true
 
     - name: "Write .desktop files"
       ansible.builtin.copy:
@@ -65,16 +64,16 @@
           comment: Kill All Monsters on Campaign
         - name: MegaMek SNAPSHOT
           dir: megamek-SNAPSHOT
-          cmd: megamek-startup
+          cmd: MegaMek.sh
           icon: megamek
           comment: Kill All Monsters SNAPSHOT
         - name: MegaMekLab SNAPSHOT
           dir: megameklab-SNAPSHOT
-          cmd: megameklab-startup
+          cmd: MegaMekLab.sh
           icon: megameklab
           comment: Kill All Monsters Lab SNAPSHOT
         - name: MekHQ SNAPSHOT
           dir: mekhq-SNAPSHOT
-          cmd: mekhq-startup
+          cmd: MekHQ.sh
           icon: mekhq
           comment: Kill All Monsters on Campaign SNAPSHOT

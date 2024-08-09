@@ -26,4 +26,10 @@
         - newmek
         - mekdesktop
         - getmekscripts
+
+    - name: "Remove obsolete scripts"
+      ansible.builtin.file:
+        dest: "{{ bin_dir }}/{{ item }}"
+        state: absent
+      loop:
         - setup_mm.sh

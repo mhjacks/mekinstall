@@ -11,12 +11,30 @@
     manage_symlinks: false
     # fallback_fetch: 'http://repo.imladris.lan/repo//tarballs/megamek/MekHQ-0.50.0-SNAPSHOT.tar.gz'
     fallback_fetch: 'http://nwamek.zapto.org:3052/MekHQ-0.50.0-SNAPSHOT.tar.gz'
-    megamek_heap_size_mb: "{{ [(ansible_facts.memtotal_mb * 0.25) | int, 2048] | max }}"
+    megamek_heap_size_mb: "{{ [(ansible_facts.memtotal_mb * 0.25) | int, 4096] | max }}"
     var_debug: false
   tasks:
-    - name: Test task
+    - name: Show vars
       ansible.builtin.debug:
         msg: 'source_dir: {{ source_dir }} / inst_dir: {{ inst_dir }} / tarball_pattern: {{ tarball_pattern }}'
+
+    - name: Check for necessary directories
+      ansible.builtin.command:
+        cmd: "test -d '{{ item }}'"
+      changed_when: false
+      loop:
+        - "~/gitwork"
+        - "~/gitwork/meks"
+        - "~/gitwork/meks/custom_mtf"
+        - "~/gitwork/meks/units"
+        - "~/gitwork/meks/mmconf-standard"
+
+    - name: Update meks repo
+      ansible.builtin.command:
+        cmd: git up
+        chdir: "~/gitwork/meks"
+      ignore_errors: true
+      changed_when: true
 
     - name: "Set mekhq spec"
       ansible.builtin.set_fact:
@@ -96,20 +114,40 @@
         cmd: 'tar xvf {{ latest_mekhq }}'
         chdir: '{{ inst_dir }}'
 
-    - name: Run setup script
+    - name: Archive default config
       ansible.builtin.command:
-        cmd: 'setup_mm.sh'
-        chdir: '{{ mekhq_fulldir }}'
+        cmd: cp -a mmconf mmconf-orig
+        chdir: "{{ mekhq_fulldir }}"
+        creates: mmconf-orig
 
-#    - name: "Create symlinks if needed"
-#      ansible.builtin.command:
-#        cmd: ln -s '{{ item.src }}' '{{ item.dest }}'
-#        chdir: '{{ mekhq_fulldir }}'
-#      loop:
-#        - { src: MegaMek.sh, dest: mm-startup }
-#        - { src: MegaMekLab.sh, dest: mml-startup }
-#        - { src: MekHQ.sh, dest: mhq-startup }
-#      ignore_errors: true
+    - name: Copy in standard config
+      ansible.builtin.shell:
+        cmd: 'cp -a ~/gitwork/meks/mmconf-standard/* mmconf'
+        chdir: "{{ mekhq_fulldir }}"
+      changed_when: true
+
+    - name: Symlink unit lists
+      ansible.builtin.file:
+        src: '~/gitwork/meks/units'
+        dest: "{{ mekhq_fulldir }}/units"
+        state: link
+
+    - name: Ensure savegames directory
+      ansible.builtin.file:
+        path: "{{ mekhq_fulldir }}/savegames"
+        state: directory
+        mode: "0755"
+
+    - name: Symlink custom unit definitions
+      ansible.builtin.file:
+        src: '~/gitwork/meks/custom_mtf'
+        dest: "{{ mekhq_fulldir }}/data/mechfiles/custom_mtf"
+        state: link
+
+    - name: Enable sentry for error reporting
+      ansible.builtin.copy:
+        content: "enabled=true\n"
+        dest: "{{ mekhq_fulldir }}/sentry.properties"
 
     - name: "Adjust Megamek Heap size"
       ansible.builtin.replace:

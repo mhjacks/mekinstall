@@ -115,10 +115,9 @@
         chdir: '{{ inst_dir }}'
 
     - name: Remove any extra directories
-      ansible.builtin.path:
+      ansible.builtin.file:
         path: "{{ mekhq_fulldir }}/data/mechfiles/{{ item }}"
         state: absent
-        recurse: true
       loop:
         - battlearmor
         - convfighter

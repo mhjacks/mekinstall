@@ -36,7 +36,7 @@
 
     - name: Update meks repo
       ansible.builtin.command:
-        cmd: git up
+        cmd: git pull --all --prune --rebase --autostash --tags
         chdir: "~/gitwork/meks"
       ignore_errors: true
       changed_when: true

@@ -9,7 +9,7 @@ do
 	echo $x
 	cd ~/gitwork/$x
 	old_sha=`git rev-parse HEAD 2>/dev/null`
-	git up
+	git pull --all --prune --rebase --autostash --tags
 	new_sha=`git rev-parse HEAD 2>/dev/null`
 
 	if [ "$old_sha" != "$new_sha" ]; then
@@ -32,7 +32,7 @@ do
 	echo $x
 	cd ~/gitwork/$x
 
-	git up
+	git pull --all --prune --rebase --autostash --tags
 	git reset --hard HEAD
     ./gradlew clean
 done

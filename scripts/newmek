@@ -114,6 +114,26 @@
         cmd: 'tar xvf {{ latest_mekhq }}'
         chdir: '{{ inst_dir }}'
 
+    - name: Remove any extra directories
+      ansible.builtin.path:
+        path: "{{ mekhq_fulldir }}/data/mechfiles/{{ item }}"
+        state: absent
+        recurse: true
+      loop:
+        - battlearmor
+        - convfighter
+        - dropships
+        - fighters
+        - ge
+        - infantry
+        - jumpships
+        - mechs
+        - protomechs
+        - smallcraft
+        - spacestation
+        - vehicles
+        - warship
+
     - name: Archive default config
       ansible.builtin.command:
         cmd: cp -a mmconf mmconf-orig

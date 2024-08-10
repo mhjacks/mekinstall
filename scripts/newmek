@@ -2,8 +2,8 @@
 ---
 - name: "Install latest version of mekhq"
   hosts: localhost
-  become: false
   gather_facts: true
+  become: false
   vars:
     source_dir: "{{ '~/mm' | expanduser }}"
     inst_dir: "{{ '~/megamek' | expanduser }}"
@@ -16,7 +16,12 @@
   tasks:
     - name: Show vars
       ansible.builtin.debug:
-        msg: 'source_dir: {{ source_dir }} / inst_dir: {{ inst_dir }} / tarball_pattern: {{ tarball_pattern }}'
+        msg:
+          - "source_dir: {{ source_dir }}"
+          - "inst_dir: {{ inst_dir }}"
+          - "tarball_pattern: {{ tarball_pattern }}"
+          - "fallback_fetch: {{ fallback_fetch }}"
+          - "megamek_heap_size_mb: {{ megamek_heap_size_mb }}"
 
     - name: Check for necessary directories
       ansible.builtin.command:
@@ -42,14 +47,15 @@
 
     - name: "Discover or retrieve mekhq"
       block:
-        - name: "Discover latest mekhq version"
+        - name: "Discover mekhq versions"
           ansible.builtin.set_fact:
-            latest_mekhq: '{{ mekhq_spec | fileglob | last }}'
+            mekhq_versions: '{{ mekhq_spec | fileglob }}'
 
         - name: "Check to see if we found one"
           ansible.builtin.assert:
+            fail_msg: "Did not have a local mekhq, going to get one from {{ fallback_fetch }}"
             that:
-              - latest_mekhq is defined
+              - mekhq_versions | length
       rescue:
         - name: Get latest mekhq from local source
           ansible.builtin.get_url:

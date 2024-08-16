@@ -67,8 +67,6 @@
           ansible.builtin.set_fact:
             latest_mekhq: '{{ mekhq_spec | fileglob | last }}'
 
-
-
     - name: "Set symlink specs for normal release"
       ansible.builtin.set_fact:
         mekhq_symlinks:
@@ -145,11 +143,17 @@
         chdir: "{{ mekhq_fulldir }}"
         creates: mmconf-orig
 
+    - name: Check for template config directory
+      ansible.builtin.stat:
+        path: ~/gitwork/meks/mmconf-standard
+      register: mmconf
+
     - name: Copy in standard config
       ansible.builtin.shell:
         cmd: 'cp -a ~/gitwork/meks/mmconf-standard/* mmconf'
         chdir: "{{ mekhq_fulldir }}"
       changed_when: true
+      when: mmconf.stat.exists
 
     - name: Symlink unit lists
       ansible.builtin.file:

@@ -32,7 +32,6 @@
         - "~/gitwork/meks"
         - "~/gitwork/meks/custom_mtf"
         - "~/gitwork/meks/units"
-        - "~/gitwork/meks/mmconf-standard"
 
     - name: Update meks repo
       ansible.builtin.command:

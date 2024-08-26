@@ -56,6 +56,12 @@
             that:
               - mekhq_versions | length
       rescue:
+        - name: Ensure the directory for megamek programs exists
+          ansible.builtin.file:
+            path: "{{ source_dir }}"
+            ensure: directory
+            mode: "0755"
+
         - name: Get latest mekhq from local source
           ansible.builtin.get_url:
             url: "{{ fallback_fetch }}"

@@ -59,7 +59,7 @@
         - name: Ensure the directory for megamek programs exists
           ansible.builtin.file:
             path: "{{ source_dir }}"
-            ensure: directory
+            state: directory
             mode: "0755"
 
         - name: Get latest mekhq from local source

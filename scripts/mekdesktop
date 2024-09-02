@@ -49,17 +49,17 @@
       loop:
         - name: MegaMek
           dir: megamek
-          cmd: mm-startup
+          cmd: MegaMek.sh
           icon: megamek
           comment: Kill All Monsters
         - name: MegaMekLab
           dir: megameklab
-          cmd: mml-startup
+          cmd: MegaMekLab.sh
           icon: megameklab
           comment: Kill All Monsters Lab
         - name: MekHQ
           dir: mekhq
-          cmd: mhq-startup
+          cmd: MekHQ.sh
           icon: mekhq
           comment: Kill All Monsters on Campaign
         - name: MegaMek SNAPSHOT

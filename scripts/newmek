@@ -160,6 +160,15 @@
       changed_when: true
       when: mmconf.stat.exists
 
+    - name: Ensure start scripts are executable
+      ansible.builtin.file:
+        path: "{{ mekhq_fulldir }}/{{ item }}"
+        mode: "0755"
+      loop:
+        - MegaMek.sh
+        - MegaMekLab.sh
+        - MekHQ.sh
+
     - name: Symlink unit lists
       ansible.builtin.file:
         src: '~/gitwork/meks/units'

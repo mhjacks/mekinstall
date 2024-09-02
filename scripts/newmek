@@ -172,6 +172,14 @@
         - MegaMekLab.sh
         - MekHQ.sh
 
+    - name: Filter DOS CR-LF out of Unix scripts
+      ansible.builtin.command: |-
+        sed -i -e 's/\r//' {{ mekhq_fulldir }}/{{ item }}
+      loop:
+        - MegaMek.sh
+        - MegaMekLab.sh
+        - MekHQ.sh
+
     - name: Symlink unit lists
       ansible.builtin.file:
         src: '~/gitwork/meks/units'

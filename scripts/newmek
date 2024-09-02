@@ -165,6 +165,9 @@
         path: "{{ mekhq_fulldir }}/{{ item }}"
         mode: "0755"
       loop:
+        - bin/MegaMek
+        - bin/MegaMekLab
+        - bin/MekHQ
         - MegaMek.sh
         - MegaMekLab.sh
         - MekHQ.sh

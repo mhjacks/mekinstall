@@ -125,7 +125,7 @@
 
     - name: Remove any extra directories
       ansible.builtin.file:
-        path: "{{ mekhq_fulldir }}/data/mechfiles/{{ item }}"
+        path: "{{ mekhq_fulldir }}/data/mekfiles/{{ item }}"
         state: absent
       loop:
         - battlearmor
@@ -192,10 +192,21 @@
         state: directory
         mode: "0755"
 
+    - name: Check for new mekfiles directory
+      ansible.builtin.stat:
+        path: "{{ mekhq_fulldir }}/data/mekfiles"
+      register: mekfiles_stat
+
+    - name: Create symlink if directory does not exist
+      ansible.builtin.file:
+        src: "{{ mekhq_fulldir }}/data/mechfiles"
+        dest: "{{ mekhq_fulldir }}/data/mekfiles"
+      when: not mekfiles_stat.stat.exists
+
     - name: Symlink custom unit definitions
       ansible.builtin.file:
         src: '~/gitwork/meks/custom_mtf'
-        dest: "{{ mekhq_fulldir }}/data/mechfiles/custom_mtf"
+        dest: "{{ mekhq_fulldir }}/data/mekfiles/custom_mtf"
         state: link
 
     - name: Enable sentry for error reporting

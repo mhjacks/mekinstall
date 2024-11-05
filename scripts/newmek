@@ -35,7 +35,7 @@
 
     - name: Check for custom boards directory
       ansible.builtin.stat:
-        path: "~/gitwork/boards"
+        path: "~/gitwork/meks/boards"
       register: boards_dir
 
     - name: Update meks repo

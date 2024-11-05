@@ -33,6 +33,11 @@
         - "~/gitwork/meks/custom_mtf"
         - "~/gitwork/meks/units"
 
+    - name: Check for custom boards directory
+      ansible.builtin.stat:
+        path: "~/gitwork/boards"
+      register: boards_dir
+
     - name: Update meks repo
       ansible.builtin.command:
         cmd: git pull --all --prune --rebase --autostash --tags
@@ -140,6 +145,13 @@
         chdir: "{{ mekhq_fulldir }}"
       changed_when: true
       when: mmconf.stat.exists
+
+    - name: Copy in custom boards
+      ansible.builtin.shell:
+        cmd: 'cp -a ~/gitwork/meks/boards/* data/boards'
+        chdir: "{{ mekhq_fulldir }}"
+      changed_when: true
+      when: boards_dir.stat.exists
 
     - name: Ensure start scripts are executable
       ansible.builtin.file:

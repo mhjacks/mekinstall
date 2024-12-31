@@ -10,7 +10,7 @@
     tarball_pattern: "[Mm]ek[Hh][Qq]*"
     manage_symlinks: false
     # fallback_fetch: 'http://repo.imladris.lan/repo//tarballs/megamek/MekHQ-0.50.0-SNAPSHOT.tar.gz'
-    fallback_fetch: 'http://nwamek.zapto.org:3052/MekHQ-0.50.02-SNAPSHOT.tar.gz'
+    fallback_fetch: 'http://nwamek.zapto.org:3052/MekHQ-0.50.03-SNAPSHOT.tar.gz'
     megamek_heap_size_mb: "{{ [(ansible_facts.memtotal_mb * 0.25) | int, 4096] | max }}"
     var_debug: false
   tasks:

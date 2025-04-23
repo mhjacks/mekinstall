@@ -37,11 +37,18 @@ do
     ./gradlew clean
 done
 
+declare -A resources
+resources=(['megamek']='megamek' ['megameklab']='megameklab' ['mekhq']='MekHQ')
 for x in mekhq megamek megameklab;
 do
 	echo $x
 	cd ~/gitwork/$x
-	./gradlew clean build
+	./gradlew clean
+    BRANCH=$(git rev-parse --abbrev-ref HEAD)
+    SHORTSHA=$(git rev-parse --short HEAD)
+    echo "branch=$BRANCH" > ${resources[$x]}/resources/extraVersion.properties
+    echo "gitHash=$SHORTSHA)" >> ${resources[$x]}/resources/extraVersion.properties
+	./gradlew build -x test -PextraVersion="$BRANCH-$SHORTSHA"
 done
 
 ls -l ~/gitwork/mekhq/MekHQ/build/distributions/*.tar.gz

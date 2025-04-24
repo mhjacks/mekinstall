@@ -87,7 +87,8 @@
     - name: "Change symlink specs for SNAPSHOT versions"
       ansible.builtin.set_fact:
         mekhq_symlinks: "{{ mekhq_symlinks | map('regex_replace', '$', '-SNAPSHOT') | list }}"
-      when: "'SNAPSHOT' in latest_mekhq"
+      when: latest_mekhq | regex_search('\w{7}.tar.gz$|-SNAPSHOT')
+      #when: "'SNAPSHOT' in latest_mekhq or latest_mekhq | regex_search('\w{7}.tar.gz$')"
 
     - name: Debug task var
       ansible.builtin.debug:

@@ -4,7 +4,7 @@ mkdir ~/mm 2>/dev/null
 
 changed=0
 
-for x in megamek megameklab mekhq;
+for x in mm-data megamek megameklab mekhq;
 do
 	echo $x
 	cd ~/gitwork/$x
@@ -27,7 +27,7 @@ if [ "$changed" == "0" ]; then
 	fi
 fi
 
-for x in megamek megameklab mekhq;
+for x in mm-data megamek megameklab mekhq;
 do
 	echo $x
 	cd ~/gitwork/$x

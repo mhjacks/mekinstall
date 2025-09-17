@@ -47,7 +47,7 @@ do
     BRANCH=$(git rev-parse --abbrev-ref HEAD)
     SHORTSHA=$(git rev-parse --short HEAD)
     echo "branch=$BRANCH" > ${resources[$x]}/resources/extraVersion.properties
-    echo "gitHash=$SHORTSHA)" >> ${resources[$x]}/resources/extraVersion.properties
+    echo "gitHash=$SHORTSHA" >> ${resources[$x]}/resources/extraVersion.properties
 	./gradlew build -x test -PextraVersion="$BRANCH-$SHORTSHA"
 done
 
@@ -66,6 +66,7 @@ do
 	cd ~/gitwork/$x
 	./gradlew clean
 	git reset --hard HEAD
+    rm "${resources[$x]}/resources/extraVersion.properties"
 done
 
 ls -l ~/mm

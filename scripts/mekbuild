@@ -1,6 +1,7 @@
 #!/bin/bash
 
 mkdir ~/mm 2>/dev/null
+copyall="$1"
 
 changed=0
 
@@ -54,12 +55,13 @@ done
 ls -l ~/gitwork/mekhq/MekHQ/build/distributions/*.tar.gz
 cp ~/gitwork/mekhq/MekHQ/build/distributions/*.tar.gz ~/mm
 
-ls -l ~/gitwork/megamek/megamek/build/distributions/*.tar.gz
-cp ~/gitwork/megamek/megamek/build/distributions/*.tar.gz ~/mm
+if [ -n "$copyall" ]; then
+    ls -l ~/gitwork/megamek/megamek/build/distributions/*.tar.gz
+    cp ~/gitwork/megamek/megamek/build/distributions/*.tar.gz ~/mm
 
-# Skip megameklab on purpose - not much reason to bundle the tarball
-#ls -l ~/gitwork/megameklab/megameklab/build/distributions/*.tar.gz
-#cp ~/gitwork/megameklab/megameklab/build/distributions/*.tar.gz ~/mm
+    ls -l ~/gitwork/megameklab/megameklab/build/distributions/*.tar.gz
+    cp ~/gitwork/megameklab/megameklab/build/distributions/*.tar.gz ~/mm
+fi
 
 for x in megamek megameklab mekhq;
 do

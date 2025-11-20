@@ -57,8 +57,9 @@ cp ~/gitwork/mekhq/MekHQ/build/distributions/*.tar.gz ~/mm
 ls -l ~/gitwork/megamek/megamek/build/distributions/*.tar.gz
 cp ~/gitwork/megamek/megamek/build/distributions/*.tar.gz ~/mm
 
-ls -l ~/gitwork/megameklab/megameklab/build/distributions/*.tar.gz
-cp ~/gitwork/megameklab/megameklab/build/distributions/*.tar.gz ~/mm
+# Skip megameklab on purpose - not much reason to bundle the tarball
+#ls -l ~/gitwork/megameklab/megameklab/build/distributions/*.tar.gz
+#cp ~/gitwork/megameklab/megameklab/build/distributions/*.tar.gz ~/mm
 
 for x in megamek megameklab mekhq;
 do

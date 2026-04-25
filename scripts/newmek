@@ -10,7 +10,7 @@
     tarball_pattern: "[Mm]ek[Hh][Qq]*"
     manage_symlinks: false
     # fallback_fetch: 'http://repo.imladris.lan/repo//tarballs/megamek/MekHQ-0.50.0-SNAPSHOT.tar.gz'
-    fallback_fetch: 'http://nwamek.zapto.org:3052/MekHQ-0.50.08-SNAPSHOT.tar.gz'
+    fallback_fetch: 'http://nwamek.zapto.org:3052/MekHQ-0.50.07-SNAPSHOT.tar.gz'
     megamek_heap_size_mb: "{{ [(ansible_facts.memtotal_mb * 0.25) | int, 4096] | max }}"
     var_debug: false
   tasks:
@@ -59,7 +59,7 @@
           ansible.builtin.assert:
             fail_msg: "Did not have a local mekhq, going to get one from {{ fallback_fetch }}"
             that:
-              - mekhq_versions | length
+              - (mekhq_versions | length) | bool
       rescue:
         - name: Ensure the directory for megamek programs exists
           ansible.builtin.file:
@@ -87,7 +87,7 @@
     - name: "Change symlink specs for SNAPSHOT versions"
       ansible.builtin.set_fact:
         mekhq_symlinks: "{{ mekhq_symlinks | map('regex_replace', '$', '-SNAPSHOT') | list }}"
-      when: latest_mekhq | regex_search('\w{7}.tar.gz$|-SNAPSHOT')
+      when: (latest_mekhq | regex_search('\w{7}.tar.gz$|-SNAPSHOT')) | bool
 
     - name: Debug task var
       ansible.builtin.debug:

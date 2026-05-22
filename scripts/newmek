@@ -59,7 +59,7 @@
           ansible.builtin.assert:
             fail_msg: "Did not have a local mekhq, going to get one from {{ fallback_fetch }}"
             that:
-              - (mekhq_versions | length) | bool
+              - (mekhq_versions | length) >= 1
       rescue:
         - name: Ensure the directory for megamek programs exists
           ansible.builtin.file:

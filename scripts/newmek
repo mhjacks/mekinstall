@@ -94,9 +94,22 @@
         var: latest_mekhq
       when: var_debug
 
-    - name: "Determine mekhq dirname"
+    - name: List contents of the tarball
+      ansible.builtin.command: "tar -tf {{ latest_mekhq }}"
+      register: tar_contents
+      changed_when: false
+
+    - name: Isolate the root directory name
       ansible.builtin.set_fact:
-        mekhq_dirname: "{{ latest_mekhq | basename | replace('.tar.gz', '') }}"
+        mekhq_dirname: "{{ tar_contents.stdout_lines | first }}"
+        # mekhq_dirname: "{{ tar_contents.stdout_lines | first | ansible.builtin.basename }}"
+
+    - name: Make sure we get a name
+      ansible.builtin.assert:
+        that:
+          - (mekhq_dirname | length) > 0
+        success_msg: "mekhq_dirname is [{{ mekhq_dirname }}]"
+        fail_msg: "mekhq_dirname is empty"
 
     - name: Debug task var
       ansible.builtin.debug:
